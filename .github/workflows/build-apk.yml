@@ -31,7 +31,7 @@ jobs:
         run: |
           cp pubspec.yaml /tmp/pubspec.yaml
           rm -rf /tmp/lib && cp -r lib /tmp/lib
-          flutter create --platforms=android --org in.mindscriptsolutions --project-name farmnet .
+          flutter create --platforms=android --org com.mindscriptsolutions --project-name farmnet .
           cp /tmp/pubspec.yaml pubspec.yaml
           rm -rf lib && cp -r /tmp/lib lib
 
