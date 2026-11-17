@@ -83,9 +83,9 @@ class _ResultScreenState extends State<ResultScreen> {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.10),
+              color: statusColor.withOpacity(0.10),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: statusColor.withValues(alpha: 0.4)),
+              border: Border.all(color: statusColor.withOpacity(0.4)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
