@@ -55,27 +55,10 @@ jobs:
       - name: Force TensorFlow Lite 2.14 (fix duplicate namespace)
         run: |
           if [ -f android/app/build.gradle.kts ]; then
-            cat >> android/app/build.gradle.kts <<'EOF'
-
-configurations.all {
-    resolutionStrategy {
-        force("org.tensorflow:tensorflow-lite:2.14.0")
-        force("org.tensorflow:tensorflow-lite-api:2.14.0")
-        force("org.tensorflow:tensorflow-lite-gpu:2.14.0")
-    }
-}
-EOF
-          elif [ -f android/app/build.gradle ]; then
-            cat >> android/app/build.gradle <<'EOF'
-
-configurations.all {
-    resolutionStrategy {
-        force 'org.tensorflow:tensorflow-lite:2.14.0'
-        force 'org.tensorflow:tensorflow-lite-api:2.14.0'
-        force 'org.tensorflow:tensorflow-lite-gpu:2.14.0'
-    }
-}
-EOF
+            printf '\nconfigurations.all {\n    resolutionStrategy {\n        force("org.tensorflow:tensorflow-lite:2.14.0")\n        force("org.tensorflow:tensorflow-lite-api:2.14.0")\n        force("org.tensorflow:tensorflow-lite-gpu:2.14.0")\n    }\n}\n' >> android/app/build.gradle.kts
+          fi
+          if [ -f android/app/build.gradle ]; then
+            printf "\nconfigurations.all {\n    resolutionStrategy {\n        force 'org.tensorflow:tensorflow-lite:2.14.0'\n        force 'org.tensorflow:tensorflow-lite-api:2.14.0'\n        force 'org.tensorflow:tensorflow-lite-gpu:2.14.0'\n    }\n}\n" >> android/app/build.gradle
           fi
 
       - name: Install dependencies
