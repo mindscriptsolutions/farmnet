@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:image/image.dart' as img;
 import 'package:tflite_flutter/tflite_flutter.dart';
@@ -39,7 +40,7 @@ class Classifier {
   }
 
   /// Classify raw image bytes and return the top prediction merged with advice.
-  Future<Prediction> classify(List<int> imageBytes) async {
+  Future<Prediction> classify(Uint8List imageBytes) async {
     if (!_ready || _interpreter == null) {
       throw StateError('Classifier not initialised. Call load() first.');
     }
