@@ -18,9 +18,10 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Flutter
+      - name: Set up Flutter 3.19.6
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: "3.19.6"
           channel: stable
           cache: true
 
@@ -41,25 +42,12 @@ jobs:
 
       - name: Ensure minSdk >= 24 (required by TensorFlow Lite)
         run: |
-          for f in android/app/build.gradle.kts android/app/build.gradle; do
+          for f in android/app/build.gradle android/app/build.gradle.kts; do
             if [ -f "$f" ]; then
-              sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 24/' "$f" || true
               sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 24/' "$f" || true
+              sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 24/' "$f" || true
             fi
           done
-
-      - name: Fix Kotlin/Java JVM target mismatch (tflite_flutter)
-        run: |
-          printf '\nkotlin.jvm.target.validation.mode=warning\n' >> android/gradle.properties
-
-      - name: Force TensorFlow Lite 2.14 (fix duplicate namespace)
-        run: |
-          if [ -f android/app/build.gradle.kts ]; then
-            printf '\nconfigurations.all {\n    resolutionStrategy {\n        force("org.tensorflow:tensorflow-lite:2.14.0")\n        force("org.tensorflow:tensorflow-lite-api:2.14.0")\n        force("org.tensorflow:tensorflow-lite-gpu:2.14.0")\n    }\n}\n' >> android/app/build.gradle.kts
-          fi
-          if [ -f android/app/build.gradle ]; then
-            printf "\nconfigurations.all {\n    resolutionStrategy {\n        force 'org.tensorflow:tensorflow-lite:2.14.0'\n        force 'org.tensorflow:tensorflow-lite-api:2.14.0'\n        force 'org.tensorflow:tensorflow-lite-gpu:2.14.0'\n    }\n}\n" >> android/app/build.gradle
-          fi
 
       - name: Install dependencies
         run: flutter pub get
