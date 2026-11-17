@@ -48,6 +48,10 @@ jobs:
             fi
           done
 
+      - name: Fix Kotlin/Java JVM target mismatch (tflite_flutter)
+        run: |
+          printf '\nkotlin.jvm.target.validation.mode=warning\n' >> android/gradle.properties
+
       - name: Install dependencies
         run: flutter pub get
 
