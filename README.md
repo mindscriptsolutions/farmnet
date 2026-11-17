@@ -83,7 +83,7 @@ assets/
 
 ```bash
 flutter pub get
-flutter create --platforms=android --org in.mindscriptsolutions --project-name farmnet .
+flutter create --platforms=android --org com.mindscriptsolutions --project-name farmnet .
 flutter run        # with a phone/emulator connected
 ```
 

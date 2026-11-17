@@ -9,14 +9,12 @@ import 'knowledge_base.dart';
 
 /// Runs the bundled crop-disease model fully on-device (offline).
 ///
-/// Model: ResNet18 trained on PlantVillage (39 classes).
-/// Input : float32 NCHW [1, 3, 224, 224], ImageNet-normalised.
-/// Output: logits/probabilities over 39 classes.
+/// Model: MobileNetV2 trained on PlantVillage (38 classes).
+/// Input : float32 NHWC [1, 224, 224, 3], raw 0-255 RGB
+///         (the model has its own rescaling baked in).
+/// Output: probabilities over 38 classes.
 class Classifier {
   static const int _inputSize = 224;
-  // ImageNet normalisation used during training.
-  static const List<double> _mean = [0.485, 0.456, 0.406];
-  static const List<double> _std = [0.229, 0.224, 0.225];
 
   Interpreter? _interpreter;
   List<String> _labels = [];
@@ -59,8 +57,8 @@ class Classifier {
 
     _interpreter!.run(input, output);
 
-    // The model may output raw logits, so we normalise to probabilities
-    // defensively (works whether or not softmax is baked in).
+    // Normalise to probabilities defensively (works whether or not the model
+    // already applies softmax).
     final probs = _softmaxIfNeeded(output[0]);
 
     // Find the best class.
@@ -88,8 +86,8 @@ class Classifier {
     );
   }
 
-  /// Resize to 224x224 and build a normalised NCHW float tensor
-  /// with shape [1, 3, 224, 224] (channels-first), as the model expects.
+  /// Resize to 224x224 and build a raw-valued NHWC float tensor
+  /// with shape [1, 224, 224, 3]. Pixel values are kept in 0-255.
   List<List<List<List<double>>>> _preprocess(img.Image image) {
     final resized = img.copyResize(
       image,
@@ -98,24 +96,17 @@ class Classifier {
       interpolation: img.Interpolation.linear,
     );
 
-    // Build one 224x224 plane per channel (0=R, 1=G, 2=B).
-    List<List<double>> plane(int channel) {
-      return List.generate(_inputSize, (y) {
+    return [
+      List.generate(_inputSize, (y) {
         return List.generate(_inputSize, (x) {
           final px = resized.getPixel(x, y);
-          final double value = channel == 0
-              ? px.r / 255.0
-              : channel == 1
-                  ? px.g / 255.0
-                  : px.b / 255.0;
-          return (value - _mean[channel]) / _std[channel];
+          return [
+            px.r.toDouble(),
+            px.g.toDouble(),
+            px.b.toDouble(),
+          ];
         });
-      });
-    }
-
-    // Shape: [batch=1][channels=3][height=224][width=224]
-    return [
-      [plane(0), plane(1), plane(2)]
+      })
     ];
   }
 
