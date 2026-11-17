@@ -49,6 +49,10 @@ jobs:
             fi
           done
 
+      - name: Add TensorFlow Lite R8 keep rules
+        run: |
+          printf '# Keep TensorFlow Lite classes so R8 does not strip/complain\n-keep class org.tensorflow.** { *; }\n-keep interface org.tensorflow.** { *; }\n-dontwarn org.tensorflow.**\n-dontwarn org.tensorflow.lite.gpu.**\n' > android/app/proguard-rules.pro
+
       - name: Install dependencies
         run: flutter pub get
 
