@@ -52,6 +52,32 @@ jobs:
         run: |
           printf '\nkotlin.jvm.target.validation.mode=warning\n' >> android/gradle.properties
 
+      - name: Force TensorFlow Lite 2.14 (fix duplicate namespace)
+        run: |
+          if [ -f android/app/build.gradle.kts ]; then
+            cat >> android/app/build.gradle.kts <<'EOF'
+
+configurations.all {
+    resolutionStrategy {
+        force("org.tensorflow:tensorflow-lite:2.14.0")
+        force("org.tensorflow:tensorflow-lite-api:2.14.0")
+        force("org.tensorflow:tensorflow-lite-gpu:2.14.0")
+    }
+}
+EOF
+          elif [ -f android/app/build.gradle ]; then
+            cat >> android/app/build.gradle <<'EOF'
+
+configurations.all {
+    resolutionStrategy {
+        force 'org.tensorflow:tensorflow-lite:2.14.0'
+        force 'org.tensorflow:tensorflow-lite-api:2.14.0'
+        force 'org.tensorflow:tensorflow-lite-gpu:2.14.0'
+    }
+}
+EOF
+          fi
+
       - name: Install dependencies
         run: flutter pub get
 
